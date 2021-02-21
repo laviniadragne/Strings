@@ -1,0 +1,116 @@
+Nume: Dragne Lavinia-Stefana
+Grupa: 324 CA
+
+		INTRODUCERE IN ORGANIZAREA CALCULATOARELOR SI LIMBAJ DE ASAMBLARE
+					Tema #2 - "Strings"
+
+
+	Continutul proiectului este urmatorul:
+
+	-otp.asm contine codul sursa al programului corespunzator Task-ului 1;
+	
+	-caesar.asm contine codul sursa al programului corespunzator Task-ului 2;
+
+	-vigenere.asm contine codul sursa al programului corespunzator Task-ului 3;
+
+	-my_strstr.asm contine codul sursa al programului corespunzator Task-ului 4;
+
+	-bin_to_hex.asm contine codul sursa al programului corespunzator Task-ului 5;
+
+	-acest fisier README.
+
+	Prezentarea solutiei:
+
+		Task 1 - One Time Pad
+
+	Implementare:
+	
+	Aduc din memorie byte cu byte fiecare caracter din plaintext, le plasez in subregistrul al si
+fac operatia de xor intre acestea si elementele din key, pe rand. Registrul ebx este folosit
+ca si contor si retine pozitia elementului curent din plaintext. Registrul ecx contine lungimea
+sirului si este folosit in cadrul structurii repetitive loop.
+
+		Task 2  - Caesar Cipher
+
+	Implementare:
+	
+	Aduc in subregistrul al, din memorie, byte cu byte elementele lui plaintext. Le compar
+pe rand cu codurile ASCII, corespunzatoare literelor a, z, respectiv A, Z, pentru a determina daca
+caracterul citit este litera mica, majuscula sau nu e litera. Pentru a diferentia daca o litera
+este majuscula am folosit codul din label-ul upper_char. In cazul in care caracterul este litera, 
+ii adaug key-ul corespunzator. Verific daca, adaugand key-ul, am depasit de fapt intervalul ASCII, 
+in care se afla anterior caracterul (in cazul in care caracterul era litera mica, intervalul este 
+97-122, pentru majuscule 65-90). Daca l-am depasit, scad repetat 26 (numar corespunzator lungimii
+unui interval), pana ma replasez in interiorul intervalului corespunzator. Pentru replasarea in
+intervale, am folosite codul din label-urile lowerchar_out, decreases_lowerchar, pentru literele
+mici, respectiv upperchar_out, decreases_upperchar, pentru majuscule. Cu ajutorul instructiunilor din
+label-ul write_char, adaug in registrul edx, byte cu byte, caracterele modificate si reiau procesul,
+folosindu-ma de instructiunea loop si label-ul start. Registrul ebx este folosit drept contor,
+pentru a retine pozitia actuala in plaintext. 
+	
+		Task 3 - Vigenere Cipher
+
+	Implementare:
+
+	Voi urma acelasi algoritm ca la task2, pentru a identifica tipul caracterului ce trebuie
+codat, dar se va modifica modul in care il voi cripta cu cheia. Cu ajutorul label-ului 
+increment_char, verif_key si dec_key verific pozitia caracterului actual, ce trebuie codat si daca
+acesta se afla pe o pozitie ce depaseste lungimea cheii fac scaderi succesive, pana acesta se
+incadreaza in lungimea ei. Variabila count_key retine pozitia ultimului caracter, cu care am codat,
+din key, iar key_len retine lungimea cheii. Aduc in subregistrul bl cheia corespunzatoare, ii aflu
+pozitia in alfabet scazand 'A' si o adaug la litera ce trebuie codata, cu ajutorul label-ului
+add_key. Variabila type este setata cu 0 sau 1, in functie de tipul de litera (0 pentru
+litera mica si 1 pentru majuscula) pentru a sti in care label (jump_upper respectiv jump_lower)
+sa ne intoarcem, dupa criptare. Codul de deplasare circulara la dreapta a fiecarei 
+litere este similar cu cel de la task2, odata ce acum avem dimensiunea cu care trebuie sa deplasam
+literele. Pe masura ce inaintez in parcurgerea sirului plaintext, maresc si contorul pentru
+pozitia caracterelor din cheie, tinand cont ca un element din plaintext, daca nu e litera, nu
+trebuie codat.
+
+		Task 4 - StrStr
+
+	Implementare:
+
+	Initial tratez cazul nefavorabil, cand subsirul nu se regaseste in haystack si retin in
+substr_index lungimea lui + 1. Variabila haystack_len retine pozitia ultimului caracter din haystack,
+adica lungimea sirului - 1. Iterez prin haystack, folosindu-ma de un jump si label-ul while. Pe
+masura ce inaintez, in sir, cresc si un contor folosindu-ma de ebx, pentru a retine pozitia curenta, 
+la care ma aflu si compar sirul cu needle-ul cautat. Daca gasesc needle-ul, folosindu-ma de labelul
+write, retin pozitia lui actuala, deci prima aparitie a needle-ului in sir si opresc algoritmul.
+Cazul in care needle-ul are un singur caracter il tratez similar, doar ca voi compara byte cu byte
+fiecare element cu caracterul cautat, folosindu-ma si de label-ul one_charact. 
+
+		Task 5 - Binary to Hexadecimal
+
+	Implementare:
+
+	In variabila length_hex voi retine lungimea sirului in hexa, iar in length_bin salvez
+lungimea sirului initial, in binar. Impart lungimea sirului la 4, pentru a afla numarul de grupuri de
+4 bytes complete si il salvez in variabila four_group. Daca am un rest de bytes ce nu formeaza un
+grup de 4, ii scriu in hexa separat, folosindu-ma de label-ul write_rest. In cadrul acestuia, cu
+ajutorul label-ului while_rest si al subregistrului cl, in care retin numarul de bytes rest, scad
+'0', din fiecare caracter corespunzator stringului bin_sequence. Il shiftez la stanga cu 
+(3 - pozitia) pe care s-ar afla caracterul, daca ar fi intr-un grup de 4 bytes si il adaug la
+registrul eax, care initial e 0. La finalul buclei, formez un numar in hexa, pe baza subregistrului
+al si aplicand formula de trecere in baza 16, corespunzatoare situatiei in care ma aflu 
+(al - 10 + 'A', respectiv al - '0'). Pentru asta ma folosesc de label-ul decreases_rest. De
+asemenea, cresc valoarea lungimii sirului in hexa cu 1 si il retin in variabila length_hex scriind si
+reprezentarea bytes-lor, in hexa, la adresa registrului edx. In mod similar voi proceda si pentru
+grupele complete de 4 bytes ramase, avand grija sa micsorez numarul lor in memorie, pe masura ce le
+scriu la adresa indicata de edx. Pozitia pe care se va afla fiecare byte in grupare este stocata in
+subregistrul cl. Dupa fiecare prelucrare a unei grupe de 4 bytes, resetez subregistrul cl la 4.
+Registrul ebx retine pozitia curenta in sirul bin_sequence. Pentru operatiile cu grupe complete de 
+4 bytes, am folosit label-urile write_four, back_write_four si decreases. 
+
+
+
+
+
+
+
+
+
+
+
+
+
